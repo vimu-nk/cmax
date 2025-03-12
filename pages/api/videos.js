@@ -1,22 +1,34 @@
-import jwt from "jsonwebtoken"; // Install with `npm install jsonwebtoken`
+// videos.js - Secure Bunny.net HLS Streaming with Token Authentication
+import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
-  const { BUNNY_API_KEY, BUNNY_LIBRARY_ID } = process.env;
+	const { BUNNY_LIBRARY_ID, BUNNY_AUTH_KEY } = process.env;
 
-  const response = await fetch(
-    `https://video.bunnycdn.com/library/${BUNNY_LIBRARY_ID}/videos`,
-    { headers: { AccessKey: BUNNY_API_KEY } }
-  );
+	// Manually defined video GUIDs & Titles
+	const videos = [
+		{
+			title: "W05_P13b_TX_2_3",
+			guid: "02df3d62-c7c4-4bc9-bff8-5a5dbb4fe873",
+		},
+		{
+			title: "W05_P13b_TX_2_4",
+			guid: "104f8886-3e4d-46e1-a36b-7eaf3d58060a",
+		},
+	];
 
-  if (!response.ok) {
-    return res.status(500).json({ error: "Failed to fetch videos" });
-  }
+	// Generate secured URLs
+	const secureVideos = videos.map((video) => {
+		const token = jwt.sign(
+			{ exp: Math.floor(Date.now() / 1000) + 10800, v: video.guid },
+			BUNNY_AUTH_KEY
+		);
 
-  const data = await response.json();
-  const secureVideos = data.items.map((video) => {
-    const token = jwt.sign({ exp: Math.floor(Date.now() / 1000) + 3600 }, "your_secret_key");
-    return { ...video, securedUrl: `${process.env.BUNNY_STREAM_DOMAIN}/${BUNNY_LIBRARY_ID}/${video.guid}?token=${token}` };
-  });
+		return {
+			title: video.title,
+			guid: video.guid,
+			securedUrl: `https://video.bunnycdn.com/play/${BUNNY_LIBRARY_ID}/${video.guid}/playlist.m3u8?token=${token}`,
+		};
+	});
 
-  res.status(200).json(secureVideos);
-};
+	res.status(200).json(secureVideos);
+}

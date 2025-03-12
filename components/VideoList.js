@@ -1,37 +1,70 @@
 import { useEffect, useState } from "react";
+import "video.js/dist/video-js.css";
+import videojs from "video.js";
 
 export default function VideoList() {
-  const [videos, setVideos] = useState([]);
-  const [page, setPage] = useState(0);
+	const [videos, setVideos] = useState([]);
+	const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    fetch(`/api/videos`)
-      .then((res) => res.json())
-      .then((data) => {
-        setVideos(data.slice(page * 3, page * 3 + 3)); // Show 3 videos at a time
-      });
-  }, [page]);
+	useEffect(() => {
+		fetch(`/api/videos`)
+			.then((res) => res.json())
+			.then((data) => setVideos(data));
+	}, []);
 
-  return (
-    <div>
-      <h1 className="text-xl font-bold">Bunny.net Video Library</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {videos.map((video) => (
-          <iframe
-            key={video.guid}
-            src={`${process.env.NEXT_PUBLIC_BUNNY_STREAM_DOMAIN}/${process.env.NEXT_PUBLIC_BUNNY_LIBRARY_ID}/${video.guid}`}
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            className="w-full h-64"
-          />
-        ))}
-      </div>
-      <div className="flex justify-between mt-4">
-        <button onClick={() => setPage(page - 1)} disabled={page === 0}>
-          Previous
-        </button>
-        <button onClick={() => setPage(page + 1)}>Next</button>
-      </div>
-    </div>
-  );
+	useEffect(() => {
+		if (videos.length > 0) {
+			const player = videojs("video-player", {
+				controls: true,
+				autoplay: false,
+				fluid: true,
+				sources: [
+					{
+						src: videos[currentIndex].securedUrl,
+						type: "application/x-mpegURL",
+					},
+				],
+			});
+
+			return () => {
+				player.dispose();
+			};
+		}
+	}, [videos, currentIndex]);
+
+	return (
+		<div>
+			<h1 className="text-xl font-bold">W05_P13b_TX_2_3_&_4</h1>
+
+			{/* Video Player */}
+			<video id="video-player" className="video-js vjs-default-skin" />
+
+			{/* Video Title */}
+			<h2 className="mt-2">
+				{videos[currentIndex]?.title || "Loading..."}
+			</h2>
+
+			{/* Navigation Buttons */}
+			<div className="flex justify-between mt-4">
+				<button
+					onClick={() =>
+						setCurrentIndex((prev) => Math.max(0, prev - 1))
+					}
+					disabled={currentIndex === 0}
+				>
+					Previous
+				</button>
+				<button
+					onClick={() =>
+						setCurrentIndex((prev) =>
+							Math.min(videos.length - 1, prev + 1)
+						)
+					}
+					disabled={currentIndex === videos.length - 1}
+				>
+					Next
+				</button>
+			</div>
+		</div>
+	);
 }
