@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 		return {
 			title: video.title,
 			guid: video.guid,
-			securedUrl: `https://vz-afb45607-460.b-cdn.net/play/${BUNNY_LIBRARY_ID}/${video.guid}/playlist.m3u8?token=${token}`,
+			securedUrl: `https://vz-afb45607-460.b-cdn.net/${video.guid}/playlist.m3u8?token=${token}`,
 		};
 	});
 
