@@ -2,7 +2,7 @@
 import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
-	const { BUNNY_LIBRARY_ID, BUNNY_AUTH_KEY } = process.env;
+	const { BUNNY_CDN_URL, BUNNY_AUTH_KEY } = process.env;
 
 	// Manually defined video GUIDs & Titles
 	const videos = [
@@ -19,10 +19,13 @@ export default async function handler(req, res) {
 	// Generate secured URLs
 	const secureVideos = videos.map((video) => {
 		const token = jwt.sign(
-			{ exp: Math.floor(Date.now() / 1000) + 10800, v: video.guid },
+			{ exp: Math.floor(Date.now() / 1000) + 3600, v: video.guid },
 			BUNNY_AUTH_KEY
 		);
 
+		console.log(
+			`Generated HLS URL: ${BUNNY_CDN_URL}/${video.guid}/playlist.m3u8?token=${token}`
+		);
 		return {
 			title: video.title,
 			guid: video.guid,

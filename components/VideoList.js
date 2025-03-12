@@ -1,35 +1,55 @@
-import { useEffect, useState } from "react";
-import "video.js/dist/video-js.css";
-import videojs from "video.js";
+import { useEffect, useState, useRef } from "react";
+import "plyr/dist/plyr.css"; // Import Plyr styles
 
 export default function VideoList() {
 	const [videos, setVideos] = useState([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const videoRef = useRef(null);
+	const playerRef = useRef(null);
 
+	// Fetch video list
 	useEffect(() => {
 		fetch(`/api/videos`)
 			.then((res) => res.json())
 			.then((data) => setVideos(data));
 	}, []);
 
+	// Load Plyr only on the client-side
 	useEffect(() => {
-		if (videos.length > 0) {
-			const player = videojs("video-player", {
-				controls: true,
-				autoplay: false,
-				fluid: true,
-				sources: [
-					{
-						src: videos[currentIndex].securedUrl,
-						type: "application/x-mpegURL",
-					},
-				],
+		if (typeof window !== "undefined") {
+			import("plyr").then((module) => {
+				const Plyr = module.default;
+				if (videos.length > 0 && videoRef.current) {
+					if (!playerRef.current) {
+						playerRef.current = new Plyr(videoRef.current, {
+							controls: [
+								"play",
+								"rewind",
+								"fast-forward",
+								"progress",
+								"current-time",
+								"mute",
+								"volume",
+								"settings",
+								"fullscreen",
+							],
+							settings: ["quality", "speed", "loop"],
+						});
+					}
+					// Update video source
+					videoRef.current.src =
+						videos[currentIndex]?.securedUrl || "";
+				}
 			});
-
-			return () => {
-				player.dispose();
-			};
 		}
+
+		// Cleanup function
+		return () => {
+			if (playerRef.current) {
+				playerRef.current.destroy();
+				playerRef.current = null;
+			}
+		};
 	}, [videos, currentIndex]);
 
 	return (
@@ -37,7 +57,9 @@ export default function VideoList() {
 			<h1 className="text-xl font-bold">W05_P13b_TX_2_3_&_4</h1>
 
 			{/* Video Player */}
-			<video id="video-player" className="video-js vjs-default-skin" />
+			<div style={{ maxWidth: "800px", margin: "auto" }}>
+				<video ref={videoRef} className="plyr" controls />
+			</div>
 
 			{/* Video Title */}
 			<h2 className="mt-2">
