@@ -14,7 +14,7 @@ export default function VideoPage() {
 	// Fetch video details based on GUID
 	useEffect(() => {
 		if (guid) {
-			fetch(`/api/videos/`)
+			fetch(`/api/videos/${guid}`)
 				.then((res) => res.json())
 				.then((data) => {
 					const selectedVideo = data.find((v) => v.guid === guid);
