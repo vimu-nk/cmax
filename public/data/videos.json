@@ -11,8 +11,20 @@
 	],
 	"section2": [
 		{
-			"title": "W05_P13b_TX_2_3",
-			"guid": "0ffb117f-1003-46a9-b621-ddca53e0de98"
+			"title": "Theory 1",
+			"guid": "6ee4e49d-ebf1-4d37-807b-05a0f713cd41"
+		},
+		{
+			"title": "Theory 2",
+			"guid": "83a0f30e-01eb-4ca7-9735-023be5efca51"
+		},
+		{
+			"title": "Theory 3",
+			"guid": "cfb2b974-3ef0-4c80-a151-91741c6ab4e4"
+		},
+		{
+			"title": "Theory 4",
+			"guid": "c2f15237-a9cf-4d98-a3a3-8e279bc22024"
 		}
 	]
 }
