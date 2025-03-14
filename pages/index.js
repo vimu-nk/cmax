@@ -2,13 +2,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-	const [videos, setVideos] = useState([]);
+	const [sections, setSections] = useState([]);
 
-	// Fetch video list
+	// Fetch section data from the JSON file
 	useEffect(() => {
-		fetch(`/api/videos`)
-			.then((res) => res.json())
-			.then((data) => setVideos(data));
+		fetch("/data/sections.json")
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error("Failed to fetch sections");
+				}
+				return res.json();
+			})
+			.then((data) => setSections(data))
+			.catch((error) => {
+				console.error("Error fetching sections:", error);
+			});
 	}, []);
 
 	return (
@@ -20,14 +28,14 @@ export default function Home() {
 				background: "black",
 			}}
 		>
-			<h1 style={{ marginBottom: "20px" }}>Video List</h1>
+			<h1 style={{ marginBottom: "20px" }}>Video Sections</h1>
 
-			{/* List of Videos as Buttons */}
+			{/* Dynamically generate buttons for each section */}
 			<div>
-				{videos.map((video, index) => (
+				{sections.map((section) => (
 					<Link
-						key={video.guid}
-						href={`/videos/${video.guid}`}
+						key={section.id}
+						href={`/sections/${section.id}`}
 						passHref
 					>
 						<button
@@ -42,7 +50,7 @@ export default function Home() {
 								fontWeight: "bold",
 							}}
 						>
-							{video.title}
+							{section.name}
 						</button>
 					</Link>
 				))}
