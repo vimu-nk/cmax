@@ -7,7 +7,12 @@ export default async function handler(req, res) {
 	const { sectionId } = req.query;
 
 	// Read video data from the JSON file
-	const videosFilePath = path.join(process.cwd(), "data", "videos.json");
+	const videosFilePath = path.join(
+		process.cwd(),
+		"public",
+		"data",
+		"videos.json"
+	);
 	const videosData = JSON.parse(fs.readFileSync(videosFilePath, "utf8"));
 
 	// Get videos for the specific section
