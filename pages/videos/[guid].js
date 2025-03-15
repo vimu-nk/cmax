@@ -135,7 +135,7 @@ export default function VideoPage() {
 
 			{/* Video Player */}
 			<div style={{ maxWidth: "800px", margin: "auto" }}>
-				<video ref={videoRef} className="plyr" controls autoPlay />
+				<video ref={videoRef} className="plyr" controls />
 			</div>
 
 			{/* Back Button */}
